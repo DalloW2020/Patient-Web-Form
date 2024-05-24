@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Notes</title>
+    <style>
+        #details {
+            background-color: blue
+        }
+    </style>
+</head>
+<body>
+{% include 'navbar.html' %}
+<div class="container" id="details">
+    <h4> ID:{{patient_details.id}}, <b>{{patient_details.surname}},</b> {{patient_details.first_name}} {{patient_details.middle_name}}, {{patient_details.dob}} Email:{{patient_details.email}}</h4>
+</div>
+
+<br/><br/><br/>
+
+
+
+<div class="container form-floating width-75">
+    <h5>Enter Patient Notes Here</h5>
+  <textarea class="form-control" placeholder="Leave a comment here" id="patient_note" style="height: 500px"></textarea>
+  <label for="patient_note"></label>
+
+
+</body>
+</html>

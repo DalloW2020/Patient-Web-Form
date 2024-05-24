@@ -2,6 +2,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, FloatField, URLField, DateField, RadioField
 from wtforms.validators import DataRequired, Email
+from wtforms.widgets import TextArea
 
 class Intake(FlaskForm):
     fname = StringField('First Name', validators=[DataRequired()])
@@ -15,3 +16,5 @@ class Intake(FlaskForm):
     gender = StringField('Birth Gender', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Submit')
+
+

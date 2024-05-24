@@ -25,6 +25,7 @@ db.create_all()
 """
 
 
+
 class DbRegistration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String, nullable=False)
@@ -37,9 +38,15 @@ class DbRegistration(db.Model):
     city = db.Column(db.String, nullable=False)
     postcode = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
+    # primary_notes = db.Column(db.String)
 
     def __repr__(self):
         return '<Name %r>' % self.name
+
+@app.route('/patient_notes<int:id>')
+def patient_notes(id):
+    patient_details = DbRegistration.query.get_or_404(id)
+    return render_template('patient_notes.html', patient_details=patient_details, notes=notes)
 
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
