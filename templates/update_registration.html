@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update</title>
+</head>
+<body>
+{% include 'navbar.html' %}
+<div class="container">
+    <form class="row g-3" method="POST" action="{{url_for('update_record', id=user_to_update.id)}}">
+  <div class="col-md-3">
+    {{form.fname.label(class="form-label")}}
+    {{ form.fname (class="form-control" , value= user_to_update.first_name) }}
+  </div>
+    <div class="col-md-3">
+    {{form.mname.label(class="form-label")}}
+    {{ form.mname(class="form-control", value= user_to_update.middle_name) }}
+  </div>
+    <div class="col-md-3">
+    {{form.sname.label(class="form-label")}}
+    {{ form.sname(class="form-control", value= user_to_update.surname) }}
+  </div>
+  <div class="col-2">
+    {{form.gender.label(class="form-label")}}
+   {{ form.gender ( class="form-control" , value= user_to_update.gender) }}
+
+  </div><br/>
+  <div class="col-12">
+    {{ form.address.label(class="form-label") }}
+    {{ form.address(class="form-control", value= user_to_update.address) }}
+  </div>
+  <div class="col-md-4">
+    {{ form.city.label(class="form-label") }}
+    {{ form.city(class="form-control", value= user_to_update.city) }}
+  </div>
+  <div class="col-xl-2">
+    {{form.state.label(class="form-label" , value= user_to_update.state )}}<br/>
+    <select {{ form.state ( class="form-select" ) }} c>
+      <option selected>Choose...</option>
+      <option>WA</option>
+      <option>NSW</option>
+      <option>QLD</option>
+      <option>VIC</option>
+      <option>ACT</option>
+      <option>NT</option>
+      <option>SA</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    {{form.postcode.label(class="form-label")}}
+    {{ form.postcode(class="form-control", value= user_to_update.postcode) }}
+  </div>
+  <div class="col-md-2">
+    {{form.dob.label(class="form-label")}}
+    {{ form.dob(class="form-control", value= user_to_update.dob) }}
+  </div>
+  <div class="col-md-12">
+    {{ form.email.label(class="form-label") }}
+    {{ form.email(class="form-control", value= user_to_update.email) }}
+  </div>
+
+  <div><br/><br/>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Update</button>
+  </div>
+  </div>
+
+</body>
+</html>

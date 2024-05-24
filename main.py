@@ -42,6 +42,29 @@ class DbRegistration(db.Model):
         return '<Name %r>' % self.name
 
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update_record(id):
+    user_to_update = DbRegistration.query.get_or_404(id)
+    form = Intake()
+    registration = DbRegistration()
+    patient = registration.query.order_by(registration.id)
+    if request.method == "POST":
+        user_to_update.first_name = request.form['fname']
+        user_to_update.middle_name = request.form['mname']
+        user_to_update.surname = request.form['sname']
+        user_to_update.gender = request.form['gender']
+        user_to_update.dob = request.form['dob']
+        user_to_update.address = request.form['address']
+        user_to_update.state = request.form['state']
+        user_to_update.city = request.form['city']
+        user_to_update.postcode = request.form['postcode']
+        user_to_update.email = request.form['email']
+        db.session.commit()
+        return redirect("/")
+    return render_template("update_registration.html", user_to_update=user_to_update,
+                           form=form, patient=patient)
+
+
 @app.route('/delete/<int:id>')
 def delete_entry(id):
     user_to_delete = DbRegistration.query.get_or_404(id)
