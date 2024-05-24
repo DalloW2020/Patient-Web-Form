@@ -3,9 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <style>
+        .container {
+            text-align: center
+        }
+
+    </style>
 </head>
 <body>
- <a href="{{url_for('register')}}" >Register New Patient</a>
+{% include 'navbar.html' %}
 
+<div class="container" id="home"><br/>
+    <h1>Patient Database</h1>
+    <table class="table">
+        {% for patient in patients %}
+     <div id="table"><br/>
+        {{patient.id}}  {{patient.first_name}}   {{patient.surname}}     {{patient.email}}  <a href="{{url_for('delete_entry', id=patient.id)}}">| Delete | </a>  <a href="#"> Update |</a><br/>
+        {% endfor %}
+     </div>
+</div>
 </body>
 </html>

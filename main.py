@@ -23,6 +23,8 @@ from main import app, db
 app.app_context().push()
 db.create_all()
 """
+
+
 class DbRegistration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String, nullable=False)
@@ -39,9 +41,30 @@ class DbRegistration(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+
+@app.route('/delete/<int:id>')
+def delete_entry(id):
+    user_to_delete = DbRegistration.query.get_or_404(id)
+    form = Intake()
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        patient = DbRegistration.query.order_by(DbRegistration.id)
+        return render_template("home.html", form=form,
+                               user_to_delete=user_to_delete,
+                               patient=patient)
+    except:
+        patient = DbRegistration.query.order_by(DbRegistration.id)
+        return render_template("home.html", form=form,
+                               user_to_delete=user_to_delete,
+                               patient=patient)
+
+
 @app.route('/')
 def home():
-    return render_template('home.html')
+    registration = DbRegistration()
+    patients = registration.query.order_by(registration.id)
+    return render_template('home.html', patients=patients)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -64,19 +87,17 @@ def register():
             db.session.add(person)
             db.session.commit()
             patient = DbRegistration.query.order_by(DbRegistration.id)
-            return render_template('home.html', form=form,
+            return render_template('register.html', form=form,
                                    registration=registration,
                                    patient=patient)
         patient = DbRegistration.query.order_by(DbRegistration.id)
-        return render_template('home.html', form=form,
+        return render_template('register.html', form=form,
                                registration=registration,
                                patient=patient)
     patient = DbRegistration.query.order_by(DbRegistration.id)
     return render_template('register.html', form=form,
                            registration=registration,
                            patient=patient)
-
-
 
 
 if __name__ == '__main__':
