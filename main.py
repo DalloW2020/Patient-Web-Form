@@ -1,21 +1,23 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Float
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, foreign
+from sqlalchemy import Integer, String, Float, Column, Integer, ForeignKey
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, FloatField, URLField, DateField, RadioField
 from wtforms.validators import DataRequired, Email
 import requests
 from flask_migrate import Migrate
 from datetime import datetime
-from forms import Intake
+from forms import Intake, ObsForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'it-is-a-secret-key-for-test-purposes'
 Bootstrap5(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///registration.db'
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+base = DeclarativeBase()
 
 """
 TYPE THIS INTO THE PYTHON TERMINAL TO CREATE DATABASE
@@ -23,10 +25,14 @@ from main import app, db
 app.app_context().push()
 db.create_all()
 """
+"""
+Flask migrate commands:
+flask db migrate -m "enter a tag"
+flask db upgrade
+"""
 
 
-
-class DbRegistration(db.Model):
+class dbregistration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String, nullable=False)
     middle_name = db.Column(db.String, nullable=False)
@@ -38,22 +44,45 @@ class DbRegistration(db.Model):
     city = db.Column(db.String, nullable=False)
     postcode = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
-    # primary_notes = db.Column(db.String)
+    primary_notes = db.Column(db.String)
+    observations = db.relationship('Observation', backref='dbregistration')
 
     def __repr__(self):
         return '<Name %r>' % self.name
 
+class Observation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    dbregistration_id = db.Column(db.Integer, db.ForeignKey('dbregistration.id'))
+    sbp = db.Column(db.Integer)
+    dbp = db.Column(db.Integer)
+    hr = db.Column(db.Integer)
+    rr = db.Column(db.Integer)
+    spo2 = db.Column(db.Integer)
+    gcs = db.Column(db.Integer)
+    temp = db.Column(db.Integer)
+    cap_refill = db.Column(db.String)
+    l_pupil_size = db.Column(db.Integer)
+    r_pupil_size = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+
+
 @app.route('/patient_notes<int:id>')
 def patient_notes(id):
-    patient_details = DbRegistration.query.get_or_404(id)
-    return render_template('patient_notes.html', patient_details=patient_details, notes=notes)
+    patient_details = dbregistration.query.get_or_404(id)
+    obsform = ObsForm()
+    return render_template('patient_notes.html',
+                           patient_details=patient_details,
+                           obsform=obsform)
 
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update_record(id):
-    user_to_update = DbRegistration.query.get_or_404(id)
+    user_to_update = dbregistration.query.get_or_404(id)
     form = Intake()
-    registration = DbRegistration()
+    registration = dbregistration()
     patient = registration.query.order_by(registration.id)
     if request.method == "POST":
         user_to_update.first_name = request.form['fname']
@@ -74,17 +103,17 @@ def update_record(id):
 
 @app.route('/delete/<int:id>')
 def delete_entry(id):
-    user_to_delete = DbRegistration.query.get_or_404(id)
+    user_to_delete = dbregistration.query.get_or_404(id)
     form = Intake()
     try:
         db.session.delete(user_to_delete)
         db.session.commit()
-        patient = DbRegistration.query.order_by(DbRegistration.id)
+        patient = dbregistration.query.order_by(dbregistration.id)
         return render_template("home.html", form=form,
                                user_to_delete=user_to_delete,
                                patient=patient)
     except:
-        patient = DbRegistration.query.order_by(DbRegistration.id)
+        patient = dbregistration.query.order_by(dbregistration.id)
         return render_template("home.html", form=form,
                                user_to_delete=user_to_delete,
                                patient=patient)
@@ -92,7 +121,7 @@ def delete_entry(id):
 
 @app.route('/')
 def home():
-    registration = DbRegistration()
+    registration = dbregistration()
     patients = registration.query.order_by(registration.id)
     return render_template('home.html', patients=patients)
 
@@ -100,11 +129,11 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = Intake()
-    registration = DbRegistration()
+    registration = dbregistration()
     if request.method == 'POST':
         person = registration.query.filter_by(email=form.email.data).first()
         if person is None:
-            person = DbRegistration(first_name=form.fname.data,
+            person = dbregistration(first_name=form.fname.data,
                                     middle_name=form.mname.data,
                                     surname=form.sname.data,
                                     gender=form.gender.data,
@@ -116,15 +145,15 @@ def register():
                                     email=form.email.data)
             db.session.add(person)
             db.session.commit()
-            patient = DbRegistration.query.order_by(DbRegistration.id)
+            patient = dbregistration.query.order_by(dbregistration.id)
             return render_template('register.html', form=form,
                                    registration=registration,
                                    patient=patient)
-        patient = DbRegistration.query.order_by(DbRegistration.id)
+        patient = dbregistration.query.order_by(dbregistration.id)
         return render_template('register.html', form=form,
                                registration=registration,
                                patient=patient)
-    patient = DbRegistration.query.order_by(DbRegistration.id)
+    patient = dbregistration.query.order_by(dbregistration.id)
     return render_template('register.html', form=form,
                            registration=registration,
                            patient=patient)

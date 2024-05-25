@@ -17,4 +17,15 @@ class Intake(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Submit')
 
+class ObsForm(FlaskForm):
+    sbp = IntegerField('Systolic BP')
+    dbp = IntegerField('Diastolic BP')
+    hr = IntegerField('Heart Rate')
+    rr = IntegerField('Respiration Rate')
+    spo2 = IntegerField('SpO2')
+    gcs = IntegerField('GCS')
+    temp = IntegerField('Temperature')
+    cap_refill = StringField('Capillary Refill')
+    l_pupil_size = IntegerField('Left Pupil')
+    r_pupil_size = IntegerField('Right Pupil')
 
